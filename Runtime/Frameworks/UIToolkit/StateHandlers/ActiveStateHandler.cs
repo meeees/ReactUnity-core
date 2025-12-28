@@ -19,7 +19,7 @@ namespace ReactUnity.UIToolkit.StateHandlers
             OnStateStart?.Invoke();
         }
 
-        public void OnPointerUp(MouseUpEvent eventData)
+        public void OnPointerUp(IMouseEvent eventData)
         {
             OnStateEnd?.Invoke();
         }
@@ -30,6 +30,7 @@ namespace ReactUnity.UIToolkit.StateHandlers
             target.RegisterCallback<MouseDownEvent>(OnPointerDown,
                     target is Button ? TrickleDown.TrickleDown : TrickleDown.NoTrickleDown);
             target.RegisterCallback<MouseUpEvent>(OnPointerUp);
+            target.RegisterCallback<MouseLeaveEvent>(OnPointerUp);
         }
 
         protected override void UnregisterCallbacksFromTarget()
@@ -37,6 +38,7 @@ namespace ReactUnity.UIToolkit.StateHandlers
             target.UnregisterCallback<MouseDownEvent>(OnPointerDown,
                     target is Button ? TrickleDown.TrickleDown : TrickleDown.NoTrickleDown);
             target.UnregisterCallback<MouseUpEvent>(OnPointerUp);
+            target.RegisterCallback<MouseLeaveEvent>(OnPointerUp);
         }
     }
 }
