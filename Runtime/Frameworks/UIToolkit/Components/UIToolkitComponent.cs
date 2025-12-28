@@ -493,7 +493,7 @@ namespace ReactUnity.UIToolkit
                 for (int i = currentIndex + 1; i < count; i++)
                 {
                     var sb = siblings[i].userData as IReactComponent;
-                    if (sb.CurrentOrder > current || (sb.CurrentOrder == current && sb.ParentIndex > ParentIndex)) break;
+                    if (sb == null || sb.CurrentOrder > current || (sb.CurrentOrder == current && sb.ParentIndex > ParentIndex)) break;
                     expectedIndex = i;
                 }
             }
@@ -502,7 +502,7 @@ namespace ReactUnity.UIToolkit
                 for (int i = currentIndex - 1; i >= 0; i--)
                 {
                     var sb = siblings[i].userData as IReactComponent;
-                    if (sb.CurrentOrder < current || (sb.CurrentOrder == current && sb.ParentIndex < ParentIndex)) break;
+                    if (sb == null || sb.CurrentOrder < current || (sb.CurrentOrder == current && sb.ParentIndex < ParentIndex)) break;
                     expectedIndex = i;
                 }
             }
