@@ -16,6 +16,8 @@ namespace ReactUnity.Styling.Converters
         static private HashSet<string> DefaultAllowedFunctions = new HashSet<string> { "var" };
         protected virtual HashSet<string> AllowedFunctions => DefaultAllowedFunctions;
 
+        private static Dictionary<(string, Type), IComputedValue?> styleCache = new Dictionary<(string, Type), IComputedValue?>();
+
         protected virtual Type TargetType => null;
 
         public virtual bool HandleKeyword(CssKeyword keyword, out IComputedValue result)
@@ -71,14 +73,35 @@ namespace ReactUnity.Styling.Converters
                 return false;
             }
 
-            if (ParserHelpers.TryParseVariables(value, out result)) return true;
+            if(styleCache.TryGetValue((value, TargetType), out result))
+            {
+                return result != null;
+            }
 
-            var fns = AllowedFunctions;
-            if (fns.Count > 0 && CssFunctions.TryCall(value, out var fnResult, fns, this)) return TryConvert(fnResult, out result);
+            bool success = false;
+            if (ParserHelpers.TryParseVariables(value, out result))
+            {
+                success = true;
+            }
+            else
+            {
+                var fns = AllowedFunctions;
+                if (fns.Count > 0 && CssFunctions.TryCall(value, out var fnResult, fns, this))
+                {
+                    success = TryConvert(fnResult, out result);
+                }
+                else if (ParserHelpers.TryParseKeyword(value, out var k))
+                {
+                    success = HandleKeyword(k, out result);
+                }
+                else
+                {
+                    success = ParseInternal(value, out result);
+                }
+            }
+            styleCache[(value, TargetType)] = result;
+            return success;
 
-            if (ParserHelpers.TryParseKeyword(value, out var k)) return HandleKeyword(k, out result);
-
-            return ParseInternal(value, out result);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
